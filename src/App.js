@@ -1,32 +1,56 @@
-import './App.css';import { useState } from 'react';
-localStorage.setItem('todolist', JSON.stringify([{ task: 'clean' , checked : true},{ task: 'read' , checked : false},{ task: 'write' , checked : true},{ task: 'Code' , checked : true}]));
 
-function App() { 
-  const [todolistArr,settodolistArr] = useState(JSON.parse(localStorage.getItem('todolist')));
-  localStorage.setItem('todolist', JSON.stringify(todolistArr));
-   const taskchecked = (i) =>{
-     const todoarr = JSON.parse(localStorage.getItem('todolist'));
-     const todoArr = [...todoarr]; 
-     let todolist = todoArr.find((ele,index) => index === i)
-    todolist.checked = !(todolist.checked);
-    settodolistArr(todoArr); 
-    localStorage.setItem('todolist', JSON.stringify(todolistArr)); 
-  }
+export default function App() {
+  const SUBMIT_URL ='https://www.greatfrontend.com/api/questions/contact-form';
   
+  const submitForm = async(event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    console.log(formData.get('message'))
+   
+    try{
+      const response = await fetch(SUBMIT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.get('name'),
+          email: formData.get('email'),
+          message: formData.get('message'),
+        }),
+
+       
+      });
+       const text = await response.text();
+          alert(text);
+    }catch(error){
+
+    }
+  }
   return (
-    
-    <div className="App">
-     <header className="App-header"> 
-      <h3>Pending Task</h3> 
-      <ul>
-         {todolistArr.map((todo,index) =>
-       !todo.checked && <li><input type="checkbox" checked={todo.checked} onChange={(e)=>taskchecked(index)} /> {todo.task} </li> )}
-     </ul> 
-     <h3>Completed Task</h3> 
-     <ul> 
-      {todolistArr.map((todo,index) => 
-      todo.checked && <li><input type="checkbox" checked={todo.checked} onChange={(e)=>taskchecked(index)} /> {todo.task}</li> )} 
-      </ul>
-       </header> 
-  </div> );}
-export default App;
+    <form
+      // Ignore the onSubmit prop, it's used by GFE to
+      // intercept the form submit event to check your solution.
+      onSubmit={submitForm}>
+      <label>Enter your name:
+        <input type="text" name="name"/>
+      </label>
+      <br/>
+      <label>Enter your Email:
+      <input type="text" name="email"/>
+       </label>
+      <br/>
+     <label>Enter your Message:
+       <textarea
+          id="message-input"
+          name="message"></textarea>
+       </label>      
+       <br/>
+       <button type="submit">
+        SEND
+      </button>
+
+    </form>
+  );
+}
